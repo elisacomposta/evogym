@@ -15,6 +15,9 @@ from ppo import run_ppo
 from evogym import sample_robot, hashable
 import utils.mp_group as mp
 from utils.algo_utils import get_percent_survival_evals, mutate, TerminationCondition, Structure
+from plot_utils.grid import Grid
+from plot_utils.features import *
+from plot_utils.utils import store_plot_data
 
 def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_iters, num_cores):
     print()
@@ -86,6 +89,12 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
     population_structure_hashes = {}
     num_evaluations = 0
     generation = 0
+
+    ### INIT DATA FOR PLOTS ###
+    best_after_eval = {}
+    activity_after_eval = {}
+    performance_grid = Grid()
+    activity_grid = Grid()
     
     #generate a population
     if not is_continuing: 
@@ -118,7 +127,7 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
 
 
     while True:
-
+        
         ### UPDATE NUM SURVIORS ###			
         percent_survival = get_percent_survival_evals(num_evaluations, max_evaluations)
         num_survivors = max(2, math.ceil(pop_size * percent_survival))
@@ -174,6 +183,16 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
         for structure in structures:
             structure.compute_fitness()
 
+            # compute features
+            actuation, v, h = compute_actuation(structure)
+            emptiness = compute_emptiness(structure)
+
+            pos = performance_grid.get_pos(actuation, emptiness)
+
+            if structure.fitness > performance_grid.grid[pos]:  # update grid values
+                performance_grid.insert(structure.fitness, pos[0], pos[1])
+                activity_grid.increment(pos[0], pos[1])
+
         structures = sorted(structures, key=lambda structure: structure.fitness, reverse=True)
 
         #SAVE RANKING TO FILE
@@ -186,9 +205,30 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
         f.write(out)
         f.close()
 
-         ### CHECK EARLY TERMINATION ###
+        
+        # track generation best
+        best_after_eval[num_evaluations] = structures[0].reward
+        activity_after_eval[num_evaluations] = len(np.nonzero(activity_grid.grid)[0])
+
+
+        ### CHECK EARLY TERMINATION ###
         if num_evaluations == max_evaluations:
             print(f'Trained exactly {num_evaluations} robots')
+
+            # generate plot path
+            plot_path = os.path.join(home_path, 'plots')
+            try:
+                os.makedirs(plot_path)
+            except:
+                print("Except")
+                pass
+
+            ### STORE DATA TO PLOT
+            store_plot_data((np.array(list(activity_after_eval.keys())), np.array(list(activity_after_eval.values()))), plot_path, 'activityTrend')
+            store_plot_data((np.array(list(best_after_eval.keys())), np.array(list(best_after_eval.values()))), plot_path, 'fitnessTrend')
+            store_plot_data(activity_grid.grid, plot_path, 'activityGrid')
+            store_plot_data(performance_grid.grid, plot_path, 'performancesGrid')
+            
             return
 
         print(f'FINISHED GENERATION {generation} - SEE TOP {round(percent_survival*100)} percent of DESIGNS:\n')
@@ -219,6 +259,5 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
                 num_children += 1
                 num_evaluations += 1
 
-        structures = structures[:num_children+num_survivors]
-
+        structures = structures[:num_children+num_survivors]     
         generation += 1
