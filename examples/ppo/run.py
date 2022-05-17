@@ -26,11 +26,11 @@ def run_ppo(
     termination_condition, 
     saving_convention, 
     override_env_name = None,
-    verbose = True):
+    verbose = False):
 
     assert (structure == None) == (termination_condition == None) and (structure == None) == (saving_convention == None)
 
-    print(f'Starting training on \n{structure}\nat {saving_convention}...\n')
+    print(f'Starting training on \n{structure[0]}\nat {saving_convention}...\n')
 
     args = get_args()
     if override_env_name:
