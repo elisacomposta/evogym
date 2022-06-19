@@ -132,3 +132,13 @@ my_job = Job(
 
 In this example, gifs are generated for the experiment `ga_walking_experiment` which contains robots trained in the `Walker-v0` environment. Gifs for the top `5` robots in each generation `i` will be generated and saved to `saved_data/all_media/ga_walking_experiment_gifs/generation_i`.
 
+## Plot exp
+This file allows to scan all the outputs of an already evaluated experiment, and generates data for possible plots. The plots can be generated using the file in [this repo](https://github.com/elisacomposta/soft-robot-evolution.git)
+
+The useful parameters to change are:
+* `exp_name`: name of the already made experiment
+* `pop_size`: size of the population used in the experiment
+* `max_evaluations`: value of _max_evaluations_ defined in the experiments
+
+The results are stored in the dir _saved_data/exp_name/plots/plot_data_.
+
