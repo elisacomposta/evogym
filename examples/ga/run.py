@@ -93,7 +93,7 @@ def run_ga(experiment_name, structure_shape, pop_size, max_evaluations, train_it
     ### INIT DATA FOR PLOTS ###
     best_after_eval = {}
     activity_after_eval = {}
-    performance_grid = Grid()
+    performance_grid = Grid(default=-50)
     activity_grid = Grid()
     
     #generate a population

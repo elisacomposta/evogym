@@ -7,8 +7,11 @@ class Grid():
     Grid object to create map plot
     """
 
-    def __init__(self, shape=[10, 10], feature1_domain=[0., 1.], feature2_domain=[0., 1.]):
+    def __init__(self, default=0, shape=[10, 10], feature1_domain=[0., 1.], feature2_domain=[0., 1.]):
         self.grid = np.zeros(shape)
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                self.grid[i][j] = default
 
         self.shape = shape
         self.feature1_domain = feature1_domain
