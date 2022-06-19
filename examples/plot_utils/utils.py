@@ -18,3 +18,15 @@ def store_plot_data(data, path, file_name):
         pass
 
     np.save(os.path.join(path, 'plot_data', file_name), data)
+
+
+def get_stored_structure(structure_path):
+    """
+    Returns a structure previously stored at structure_path
+    """
+    structure_data = np.load(structure_path)
+    structure = []
+    for key, value in structure_data.items():
+        structure.append(value)
+    structure = tuple(structure)
+    return structure
