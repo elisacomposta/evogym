@@ -1,6 +1,6 @@
 ## Fork notes
 The Genetic Algorithm example is modified so as to make a fair comparison with Map Elites QD algorithm.<br>
-[This repo](https://github.com/elisacomposta/soft-robot-evolution.git) proposes soft robot evolution using evogym benchmark and Map Elites.
+[This repo](https://github.com/elisacomposta/soft-robot-evolution.git) proposes soft robot evolution using _evogym_ benchmark and _Map Elites_.
 
 
 # Evolution Gym
